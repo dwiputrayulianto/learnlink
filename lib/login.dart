@@ -1,10 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:projectuts/constant.dart';
+import 'package:http/http.dart' as http;
 import 'package:projectuts/register.dart';
 import 'package:projectuts/tabbar.dart';
+import 'package:projectuts/constant.dart';
 
-class LoginPage extends StatelessWidget{
-  const LoginPage({Key? key}) :super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    final response = await http.post(
+      Uri.parse('https://learnlinkuts.000webhostapp.com/login.php'),
+      body: {'username': username, 'password': password},
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return TabBarApp();
+        }),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Gagal'),
+            content: Text('Username atau password salah.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,148 +60,33 @@ class LoginPage extends StatelessWidget{
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 32),
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("SELAMAT DATANG", style: textTextStyle.copyWith(fontSize: 30, fontWeight: bold),
-            textAlign: TextAlign.center,),
-            SizedBox(height: 11),
-            Text("Sekolah Tinggi Teknologi Bandung", style: secondaryTextStyle.copyWith(fontSize: 12),),
-            SizedBox(height: 64,),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Email", style: textTextStyle.copyWith(fontSize: 12, fontWeight: bold
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
                 ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: whiteColor,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "dwiputra@gmail.com",
-                      hintStyle: textTextStyle.copyWith(fontSize: 12, color: textColor.withOpacity(0.6)),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 17)
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text("Password", style: textTextStyle.copyWith(fontSize: 12, fontWeight: bold
-                ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: whiteColor,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-                      suffixIcon: Icon(Icons.visibility_off)
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20,),
-            Row(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: buttonColor,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    Text("Ingat saya", style: greyTextStyle.copyWith(fontSize: 12),),
-
-                  ],
-                ),
-                SizedBox(width: 15,),
-                Text("Lupa kata sandi ?", style: textTextStyle.copyWith(fontSize: 12),),
-              ],
-            ),
-            SizedBox(height: 32,),
-            Container(
-              width: double.infinity,
-              height: 50,
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: utamaButtonColor,
-                ),
-                onPressed: () {
-                  Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        return TabBarApp();
-      }),
-    );
-                }, 
-              child: Text("LOGIN", style: whiteTextStyle.copyWith(fontWeight: bold),),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 50,
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 19),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
+              SizedBox(height: 10),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
                 ),
-                onPressed: () {
-                  
-                }, 
-                
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network("https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-1024.png", height: 20,),
-                  SizedBox(width: 12,),
-                  Text("Masuk dengan Google", style: textTextStyle.copyWith(fontWeight: bold),),
-                ],
+                obscureText: true,
               ),
-
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _login,
+                child: Text('LOGIN'),
               ),
-            ),
-            
-Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Text("Kamu belum punya akun? ", style: secondaryTextStyle.copyWith(fontSize: 12),),
-    GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => RegisterPage()),
-        );
-      },
-      child: Text(
-        "Buat Akun",
-        style: tncTextStyle.copyWith(fontSize: 12),
-      ),
-    ),
-  ],
-),
-
-            
-            
-              ],
-              ),
+            ],
+          ),
         ),
       ),
     );
-}
+  }
 }
